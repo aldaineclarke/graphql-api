@@ -1,10 +1,9 @@
 
-const express = require('express');
-const passport = require('passport');
-const LocalStrategy = require('../services/strategies/local');
-const User = require('../schema/user');
+import passport from 'passport';
+import LocalStrategy from '../services/strategies/local.js';
+import {User} from '../schema/user.js';
 
-class Passport {
+export default new class Passport {
 	mountPackage (_express){
 		_express = _express.use(passport.initialize());
 		_express = _express.use(passport.session());
@@ -53,5 +52,3 @@ class Passport {
 	// 	}
 	// }
 }
-
-module.exports = new Passport;

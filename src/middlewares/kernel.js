@@ -4,11 +4,11 @@
  * @author Faiz A. Farooqui <faiz@geekyants.com>
  */
 
-const CORS = require('./cors');
-const Http = require('./http');
-const Locals = require('../providers/locals');
+import CORS from './cors.js';
+import Http from './http.js';
+import Locals from '../providers/locals.js';
 
-class Kernel {
+export default class Kernel {
 	static init (_express) {
 		// Check if CORS is enabled
 		if (Locals.config().isCORSEnabled) {
@@ -34,5 +34,3 @@ class Kernel {
 		return _express;
 	}
 }
-
-module.exports = Kernel;

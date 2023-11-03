@@ -4,10 +4,10 @@
  * @author Faiz A. Farooqui <faiz@geekyants.com>
  */
 
-const { Strategy } = require('passport-local');
-const User = require('../../schema/user');
+import { Strategy } from 'passport-local';
+import {User} from '../../schema/user.js';
 
-class Local {
+export default class Local {
 	static init (_passport){
 		_passport.use(new Strategy({ usernameField: 'email' }, async (email, password, done) => {
 			Log.info(`Email is ${email}`);
@@ -43,5 +43,3 @@ class Local {
 	));
 	}
 }
-
-module.exports = Local;

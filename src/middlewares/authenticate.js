@@ -1,7 +1,8 @@
-const { JsonResponse } = require("../helpers/JsonResponse.helper");
-const HttpStatusCode = require("../helpers/StatusCodes.helper");
-const jwt = require('jsonwebtoken');
-module.exports.isAuthorized = (req, res, next)=>{
+import { JsonResponse } from "../helpers/JsonResponse.helper";
+import HttpStatusCode from "../helpers/StatusCodes.helper";
+import jwt from 'jsonwebtoken';
+
+export const isAuthorized = (req, res, next)=>{
         const token = req.headers.authorization?.split(' ')[1]; // this will come over as 'Bearer `token-sent-by-user` we just need the token'
       
         if (!token) {

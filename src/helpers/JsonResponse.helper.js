@@ -2,10 +2,11 @@
  * @author Aldaine Clarke <github.com/aldaineclarke>
  */
 
-const { Response } = require("express");
-const HttpStatusCode = require("./StatusCodes.helper");
+import * as express from "express";
+const {Response} = express;
+import HttpStatusCode from "./StatusCodes.helper.js";
 
-class JsonResponse{
+export default class JsonResponse{
     /**
      * 
      * @param {Response} res This is the response from the middleware passed
@@ -40,4 +41,3 @@ class JsonResponse{
     }
 }
 
-module.exports = JsonResponse;

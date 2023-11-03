@@ -1,9 +1,10 @@
-const User = require('../../schema/user');
-const JsonResponse = require('../../helpers/JsonResponse.helper');
-const HttpStatusCode = require('../../helpers/StatusCodes.helper');
-const { ValidationChain, body, validationResult } = require('express-validator');
+import {User} from '../../schema/user.js';
+import JsonResponse from '../../helpers/JsonResponse.helper.js';
+import HttpStatusCode from '../../helpers/StatusCodes.helper.js';
+import pkg from 'express-validator';
+const { ValidationChain, body, validationResult } = pkg;
 
-class UserController{
+export default class UserController{
     
 
     static async getAllUsers(req, res){
@@ -26,5 +27,3 @@ class UserController{
 
     }
 }
-
-module.exports = UserController;

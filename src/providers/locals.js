@@ -1,8 +1,12 @@
-const express = require('express');
-const path = require('path');
-const dotenv = require('dotenv');
+import express from 'express';
+import path from 'path';
+import dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 
-class Locals {
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+export default class Locals {
 	/**
 	 * Makes env configs available for your app
 	 * throughout the app's runtime
@@ -71,5 +75,3 @@ class Locals {
 		return _express;
 	}
 }
-
-module.exports = Locals;

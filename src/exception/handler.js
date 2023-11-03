@@ -4,12 +4,11 @@
  * @author Faiz A. Farooqui <faiz@geekyants.com>
  */
 
-const express = require('express');
-const Locals = require('../providers/locals');
-const JsonResponse = require('../helpers/JsonResponse.helper');
-const HttpStatusCode = require('../helpers/StatusCodes.helper');
+import Locals from '../providers/locals.js';
+import JsonResponse from '../helpers/JsonResponse.helper.js';
+import HttpStatusCode from '../helpers/StatusCodes.helper.js';
 
-class Handler {
+export default class Handler {
 	/**
 	 * Handles all the not found routes
 	 */
@@ -78,4 +77,3 @@ class Handler {
 	}
 }
 
-module.exports = Handler;

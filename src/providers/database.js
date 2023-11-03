@@ -1,8 +1,8 @@
-const mongoose = require('mongoose');
-const Locals = require('./locals');
-const Log = require('../middlewares/log');
+import mongoose from 'mongoose';
+import Locals from './locals.js';
+import Log from '../middlewares/log.js';
 
-class Database {
+export default class Database {
 	// Initialize your database pool
 	static init () {
 		const dsn = Locals.config().mongooseUrl;
@@ -18,5 +18,3 @@ class Database {
 		});
 	}
 }
-
-module.exports = Database;

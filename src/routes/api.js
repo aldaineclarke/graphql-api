@@ -1,16 +1,14 @@
-const { Router } = require('express');
-// const expressJwt = require('express-jwt');
-
-const Locals = require('../providers/locals');
-const AuthController = require('../controllers/api/auth.controller');
-const UserController = require('../controllers/api/user.controller');
+import { Router } from 'express';
+// import expressJwt from 'express-jwt';
+import AuthController from '../controllers/api/auth.controller.js';
+import UserController from '../controllers/api/user.controller.js';
 
 
-// const HomeController = require('../controllers/Api/Home');
-// const RegisterController = require('../controllers/Api/Auth/Register');
-// const RefreshTokenController = require('../controllers/Api/Auth/RefreshToken');
+// import HomeController from '../controllers/Api/Home';
+// import RegisterController from '../controllers/Api/Auth/Register';
+// import RefreshTokenController from '../controllers/Api/Auth/RefreshToken';
 
-const router = Router();
+ const router = Router();
 
 // router.get('/', HomeController.index);
 
@@ -20,4 +18,4 @@ router.post('/auth/register', AuthController.ValidateAndRegister());
 
 router.get('/users', UserController.getAllUsers);
 
-module.exports = router;
+export default router;

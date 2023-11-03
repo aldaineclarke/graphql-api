@@ -2,15 +2,18 @@
  * Creates & maintains the log
  */
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { URL } from 'url';
 
-class Log {
-	 baseDir;
-	 fileName;
-	 linePrefix;
+const __dirname = new URL('.', import.meta.url).pathname.slice(1);
 
-	 today = new Date();
+export default new class Log {
+	baseDir;
+	fileName;
+	linePrefix;
+
+	today = new Date();
 
 	constructor() {
 		let _dateString = `${this.today.getFullYear()}-${(this.today.getMonth() + 1)}-${this.today.getDate()}`;
@@ -28,7 +31,7 @@ class Log {
 	 * Level 1 log
 	 * @param {string} _string 
 	 */
-	info (_string) {
+info (_string) {
 		this.addLog('INFO', _string);
 	}
 
@@ -37,7 +40,7 @@ class Log {
 	 * This entry is used to warn user of a potential failure in the application.
 	 * Level 2 log
 	 */
-	warn (_string) {
+warn (_string) {
 		this.addLog('WARN', _string);
 	}
 
@@ -46,7 +49,7 @@ class Log {
 	 * This entry is used to inform the user that the application was unable to perform an operation due to an error.
 	 * Level 3 log
 	 */
-	error (_string) {
+error (_string) {
 		// Line break and show the first line
 		console.log('\x1b[31m%s\x1b[0m', '[ERROR] :: ' + _string.split(/r?\n/)[0]);
 
@@ -58,7 +61,7 @@ class Log {
 	 * @param {string} _string 
 	 */
 	// Adds the custom prefix string to the log string
-	custom (_logName, _string) {
+custom (_logName, _string) {
 		this.addLog(_logName, _string);
 	}
 
@@ -68,7 +71,7 @@ class Log {
 	 * @param {string} _kind
 	 * @param {string} _message
 	 */
-	addLog (_kind, _message) {
+addLog (_kind, _message) {
 		const _that = this;
 		_kind = _kind.toUpperCase();
 		// creates baseDir if the path doesn't exist
@@ -98,5 +101,3 @@ class Log {
 		});
 	}
 }
-
-module.exports = new Log;

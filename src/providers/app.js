@@ -5,13 +5,19 @@
  */
 
 // import kue from 'kue';
-const path = require('path');
-const dotenv = require('dotenv');
-const Log = require('../middlewares/log');
+import path from 'path';
+import dotenv from 'dotenv';
+import Log from '../middlewares/log.js';
 
-const Express = require('./express');
-const Database = require('./database');
-class App {
+import Express from './express.js';
+import Database from './database.js';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+export default new class App {
 	// Clear the console
 	clearConsole () {
 		process.stdout.write('\x1B[2J\x1B[0f');
@@ -43,5 +49,3 @@ class App {
 		Log.info('Worker :: Booting @ Master...');
 	}
 }
-
-module.exports = new App();

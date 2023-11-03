@@ -4,10 +4,10 @@
  * @author Faiz A. Farooqui <faiz@geekyants.com>
  */
 
-const cors = require('cors');
-const Locals = require('../providers/locals');
-const Log = require('../middlewares/log');
-class CORS {
+import cors from 'cors';
+import Locals from '../providers/locals.js';
+import Log from '../middlewares/log.js';
+export default new class CORS {
 
 	
 	mount(_express){
@@ -24,4 +24,3 @@ class CORS {
 	}
 }
 
-module.exports = new CORS;

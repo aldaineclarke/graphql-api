@@ -4,15 +4,15 @@
  * @author Faiz A. Farooqui <faiz@geekyants.com>
  */
 
-const cors = require('cors');
-// const connect = require('connect-mongo');
-const bodyParser = require('body-parser');
-const session = require('express-session');
-const Log = require('../middlewares/log');
-const Locals = require('../providers/locals');
-const Passport = require('../providers/passport');
+// import cors from 'cors';
+// import connect from 'connect-mongo';
+import bodyParser from 'body-parser';
+import session from 'express-session';
+import Log from '../middlewares/log.js';
+import Locals from '../providers/locals.js';
+import Passport from '../providers/passport.js';
 
-class Http {
+export default class Http {
 	static mount(_express) {
 		Log.info('Booting the \'HTTP\' middleware...');
 
@@ -63,5 +63,3 @@ class Http {
 		return _express;
 	}
 }
-
-module.exports = Http;

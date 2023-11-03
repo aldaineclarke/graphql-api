@@ -1,11 +1,11 @@
 
-const express = require('express');
-const Locals = require('./locals');
-const Routes = require('./routes');
-const Bootstrap = require('../middlewares/kernel');
-const ExceptionHandler = require('../exception/handler');
+import express from 'express';
+import Locals from './locals.js';
+import Routes from './routes.js';
+import Bootstrap from '../middlewares/kernel.js';
+import ExceptionHandler from '../exception/handler.js';
 
-class Express {
+export default new class Express {
 	/**
 	 * Create the express object
 	 */
@@ -61,5 +61,3 @@ class Express {
 	}
 }
 
-/** Export the express module */
-module.exports = new Express();

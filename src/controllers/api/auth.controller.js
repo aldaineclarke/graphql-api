@@ -4,13 +4,14 @@
  * @author Faiz A. Farooqui <faiz@geekyants.com>
  */
 
-const jwt = require('jsonwebtoken');
-const { ValidationChain, body, validationResult } = require('express-validator');
-const User = require('../../schema/user');
-const { JsonResponse } = require('../../helpers/JsonResponse.helper');
-const HttpStatusCode = require('../../helpers/StatusCodes.helper');
+import jwt from 'jsonwebtoken';
+import expressValidator from 'express-validator';
+const { ValidationChain, body, validationResult } = expressValidator;
+import {User} from '../../schema/user.js';
+import JsonResponse from '../../helpers/JsonResponse.helper.js';
+import HttpStatusCode from '../../helpers/StatusCodes.helper.js';
 
-class AuthController {
+export default class AuthController {
     static loginValidations = [
         body("email", "Email cannot be blank").notEmpty(),
         body('email', 'Email is not valid').isEmail(),
@@ -123,4 +124,3 @@ class AuthController {
     }   
 }
 
-module.exports = AuthController;

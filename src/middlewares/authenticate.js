@@ -1,5 +1,5 @@
-import { JsonResponse } from "../helpers/JsonResponse.helper";
-import HttpStatusCode from "../helpers/StatusCodes.helper";
+import JsonResponse from "../helpers/JsonResponse.helper.js";
+import HttpStatusCode from "../helpers/StatusCodes.helper.js";
 import jwt from 'jsonwebtoken';
 
 export const isAuthorized = (req, res, next)=>{

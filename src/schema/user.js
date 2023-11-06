@@ -15,30 +15,74 @@ export const userRoleMap = new Map([
 	[0, 'USER'],
 	[1, 'ADMIN'],
 ]);
+
+export const userGenderMap = new Map([
+	[0, 'MALE'],
+	[1, 'FEMALE'],
+])
+
+
+let userSchemaMethods = {
+	/**
+	 * Parse the User document changing the data to a more readable and easy to use form. Remove password and other fields that need to be hidden
+	 * @returns 
+	 */
+	parseUserData(){
+		try{
+			let status = userStatusMap.get(this.status);
+			let role = userRoleMap.get(this.role_id);
+			this.role_id = undefined;
+			this.password = undefined;
+			this.isDeleted = undefined;
+			let gender = userGenderMap.get(this.gender);
+			let parsedUser = {
+				...this._doc,
+				role,
+				status,
+				gender
+			}
+			return parsedUser;
+		}catch(error){
+			log(error);
+		}
+	}
+} 
+
 // Define the User Schema
 const UserSchema = new mongoose.Schema({
 	first_name: {type:String, required:[true, 'Firstname is a required field']},
 	last_name: {type: String, required: [true, 'Lastname is a required field']},
     username: { type: String, required:[true, 'Username is a required field'] },
-	email: { type: String, unique: true },
+	email: { type: String, unique: true, validate: {
+		validator: function(value){
+			return /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(value)
+		},
+		message: (prop) => `${prop.value} is not a valid email address`
+	}},
+	gender: {type: Number, enum: Array.from(userGenderMap.keys()), default: 0},
 	password: { type: String },
-	role_id: {type: Number},
+	role_id: {type: Number, enum: Array.from(userRoleMap.keys()), default: 0},
 	passwordResetToken: { type: String },
 	passwordResetExpires: {type:Date},	
-	status: { type: Number, enum: Object.keys(userStatusMap), default: 0 },
+	status: { type: Number, enum: Array.from(userStatusMap.keys()), default: 0 },
+	isDeleted: {type:Boolean, default:false}
 
 }, {
-	timestamps: true
+	timestamps: true,
+	methods:userSchemaMethods // custom methods for the user instance document.
 });
 
 // Password hash middleware
-UserSchema.pre('save', async (_next)=>{
+UserSchema.pre('save', async function(_next){
 	const user = this;
-	if (!user.isModified('password')) {
-		return _next();
+	if(user){
+		if (!user.isModified('password')) {
+			return _next();
+		}
 	}
+	
 	try{
-		let hashedPassword = await bcrypt.hash(user.password, _salt);
+		let hashedPassword = await bcrypt.hash(user.password,10);
 			user.password = hashedPassword;
 			return _next();
 	}catch(error){
@@ -48,15 +92,18 @@ UserSchema.pre('save', async (_next)=>{
 
 // Custom Methods
 // Compares the user's password with the request password
-UserSchema.methods.comparePassword = async(_requestPassword)=>{
+UserSchema.methods.comparePassword = async function(_requestPassword){
 	try{
 		return await bcrypt.compare(_requestPassword, this.password);
 	}catch(error){
+		console.log(error)
 		log.error('Unable to compare passwords');
 		throw new Error('Unable to compare passwords');
 
 	}
 };
+
+
 
 //Checks user for duplicates
 UserSchema.methods.checkDuplicates = async(_user)=>{
@@ -71,5 +118,6 @@ UserSchema.methods.checkDuplicates = async(_user)=>{
 		throw new Error('Unable to query User Table to check duplicates');
 	}
 }
+
 
 export const User = mongoose.model('User', UserSchema);

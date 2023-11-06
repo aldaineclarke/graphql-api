@@ -2,7 +2,9 @@ import { Router } from 'express';
 // import expressJwt from 'express-jwt';
 import AuthController from '../controllers/api/auth.controller.js';
 import UserController from '../controllers/api/user.controller.js';
-
+import UserRequest from '../requests/user.request.js';
+import { isAuthorized } from '../middlewares/authenticate.js';
+import { userRouter } from './user.route.js';
 
 // import HomeController from '../controllers/Api/Home';
 // import RegisterController from '../controllers/Api/Auth/Register';
@@ -12,10 +14,10 @@ import UserController from '../controllers/api/user.controller.js';
 
 // router.get('/', HomeController.index);
 
-router.post('/auth/login', AuthController.ValidateAndLogin());
-router.post('/auth/register', AuthController.ValidateAndRegister());
+router.post('/auth/login', UserRequest.validateLogin,AuthController.login);
+router.post('/auth/register',UserRequest.validateRegister,AuthController.register);
 // router.post('/auth/refresh-token', expressJwt({ secret: Locals.config().appSecret }), RefreshTokenController.perform);
 
-router.get('/users', UserController.getAllUsers);
+router.use('/users',isAuthorized,userRouter);
 
 export default router;

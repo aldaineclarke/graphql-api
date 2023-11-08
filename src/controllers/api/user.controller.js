@@ -1,4 +1,4 @@
-import {User, userStatusMap} from '../../schema/user.js';
+import {User, userGenderMap, userRoleMap, userStatusMap} from '../../schema/user.js';
 import JsonResponse from '../../helpers/JsonResponse.helper.js';
 import HttpStatusCode from '../../helpers/StatusCodes.helper.js';
 import log from '../../middlewares/log.js';
@@ -6,11 +6,87 @@ import { getKeyByValue } from '../../helpers/Utility.helper.js';
 
 export default class UserController{
     
-
+    
     static getAllUsers = async (req, res)=>{
-        const users = await User.find({isDeleted: {$ne: true}});
-        let parsedUser = users.map((user)=>user.parseUserData());
-        return JsonResponse.success(res, "Successfully retrieved users", {user:parsedUser});
+        // User should pass over role or status as the String instead of the key/id
+        let status = req.query.status;
+        let role = req.query.role;
+        let{page = 1, limit = 10} = req.query;
+        let sortField = req.query.sortField || "_id";
+        let sortOrder = req.query.sortOrder || "des";
+        const sortObj = {};
+        sortObj[sortField] = sortOrder === "asc" ? 1 : -1;
+        status = (status && typeof(status) == 'string') ? status.toUpperCase() : undefined;
+        role = (role && typeof(role) == 'string') ? role.toUpperCase() : undefined;
+        status = getKeyByValue(userStatusMap, status); // returns the key or undefined. 
+        role = getKeyByValue(userRoleMap, role);
+        const searchQuery = {
+            first_name : req.query.first_name,
+            last_name: req.query.last_name,
+            email: req.query.email,
+            role: req.query.role,
+            status:req.query.status,
+
+        };
+
+        let searchCriterias = [];
+        //remove the params without a value.
+        Object.keys(searchQuery).forEach((item)=>{
+            if(searchQuery[item] == undefined || searchQuery[item] == ""){
+                delete searchQuery[item]
+            }
+            // boolean cannot do regex operations, hence the need to format this differently
+            if(searchQuery[item] == "true" || searchQuery[item] == "false"){
+                searchCriterias.push({[item]: searchQuery[item]});
+                delete searchQuery[item];
+            }
+        });
+        //formata fhte query for partial search of the database
+        Object.keys(searchQuery).forEach((search)=>{
+            if(search == "role"){
+                searchCriterias.push({"role": {$eq: searchQuery[search]}})
+            }else if(search == "status"){
+                searchCriterias.push({"status": {$eq: searchQuery[search]}})
+            }else{
+                searchCriterias.push({
+                    [search]: {$regex: searchQuery[search], $options: "i"}
+                })
+            }
+        })
+        let $facet = {
+            metadata: [
+                {$count: "total"},
+                {$addFields: {current_page: page}}
+            ],
+            users: [
+                {$sort: sortObj},
+                {$skip: (page - 1) * limit},
+                {$limit: limit},
+                {$project: {password: 0}}
+            ]
+
+        }
+        let pipeline = [];
+        if(searchCriterias.length > 0){
+            pipeline = [
+                ...searchCriterias.map((result)=>{
+                    return {$match: result}
+                }),
+                {$match: {isDeleted: {$ne: true}}},
+                {$facet: $facet}
+            ]
+        }else{
+            pipeline = [
+                {$match: {isDeleted: {$ne: true}}},
+                {$facet: $facet}
+            ]
+        }
+
+        const aggregatedUsers = await User.aggregate(pipeline);
+        aggregatedUsers[0].users = this.parseUsers(aggregatedUsers[0].users)
+        // let parsedUsers = users.map((user)=>user.parseUserData());
+        console.log(aggregatedUsers[0].users)
+        return JsonResponse.success(res, "Successfully retrieved users", {...aggregatedUsers[0]});
     }
     static getUserById = async (req, res)=>{
         let id = req.params.id;
@@ -59,6 +135,23 @@ export default class UserController{
 
         }
 
-
     }
+    static parseUsers = (userList = [])=>{
+        return userList.map((userObj) =>{
+            let status = userStatusMap.get(userObj.status);
+			let role = userRoleMap.get(userObj.role_id);
+			userObj.role_id = undefined;
+			userObj.password = undefined;
+			userObj.isDeleted = undefined;
+			let gender = userGenderMap.get(userObj.gender);
+			return userObj = {
+				...userObj,
+				role,
+				status,
+				gender
+			}
+        });
+    }
+
+
 }

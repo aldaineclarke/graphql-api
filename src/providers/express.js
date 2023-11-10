@@ -51,7 +51,6 @@ export default new class Express {
 		this.express.use(ExceptionHandler.clientErrorHandler);
 		this.express.use(ExceptionHandler.errorHandler);
 		this.express = ExceptionHandler.notFoundHandler(this.express);
-		// Mount the socket server to the expreses application.
 		// Start the server on the specified port
 		this.express.listen(port, () => {
 			return console.log('\x1b[33m%s\x1b[0m', `Server :: Running @ 'http://localhost:${port}'`);

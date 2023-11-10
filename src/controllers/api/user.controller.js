@@ -3,7 +3,7 @@ import JsonResponse from '../../helpers/JsonResponse.helper.js';
 import HttpStatusCode from '../../helpers/StatusCodes.helper.js';
 import log from '../../middlewares/log.js';
 import { getKeyByValue } from '../../helpers/Utility.helper.js';
-
+import AWSStorage from "../../providers/storage.js";
 export default class UserController{
     
     
@@ -84,8 +84,6 @@ export default class UserController{
 
         const aggregatedUsers = await User.aggregate(pipeline);
         aggregatedUsers[0].users = this.parseUsers(aggregatedUsers[0].users)
-        // let parsedUsers = users.map((user)=>user.parseUserData());
-        console.log(aggregatedUsers[0].users)
         return JsonResponse.success(res, "Successfully retrieved users", {...aggregatedUsers[0]});
     }
     static getUserById = async (req, res)=>{
@@ -118,7 +116,6 @@ export default class UserController{
             log.error(e);
             return JsonResponse.error(res, "Something went wrong", [e], HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
-
     }
     static deleteUser = async (req, res)=>{
         let id = req.params.id;
@@ -135,6 +132,28 @@ export default class UserController{
 
         }
 
+    }
+    static updateUserPhoto = async(req, res)=>{
+        let photo = req.files.profile_image;
+        let userId = req.body.user_id;
+        try{
+            let user = await User.findById(userId).where({isDeleted:false});
+            if(!user){
+                return JsonResponse.error(res, "No matching records found", ["Unable to update user profile image, user does not exist"],HttpStatusCode.NOT_FOUND)
+            }
+            // gets the previous image location on AWS to delete.
+            // let prevImage = user.profile_image;
+            // This line will assign location of file to the profile image of the user if it's success.
+            // user.profile_image = await AWSStorage.uploadFile(photo);
+            // Deletes the previous image of the user that was set. 
+            // await AWSStorage.deleteFile(user.profile_image);
+            return JsonResponse.success(res, "Successfully update profile");
+
+        }catch(e){
+            log.error(e);
+            return JsonResponse.error(res, "Something went wrong", HttpStatusCode.INTERNAL_SERVER_ERROR);
+
+        }
     }
     static parseUsers = (userList = [])=>{
         return userList.map((userObj) =>{

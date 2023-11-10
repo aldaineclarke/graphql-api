@@ -6,25 +6,28 @@
 
 // import cors from 'cors';
 // import connect from 'connect-mongo';
-import bodyParser from 'body-parser';
 import session from 'express-session';
 import Log from '../middlewares/log.js';
 import Locals from '../providers/locals.js';
 import Passport from '../providers/passport.js';
-
+import express from 'express';
+import fileUpload from 'express-fileupload';
 export default class Http {
 	static mount(_express) {
 		Log.info('Booting the \'HTTP\' middleware...');
 
 		// Enables the request body parser
-		_express.use(bodyParser.json({
+		_express.use(express.json({
 			limit: Locals.config().maxUploadLimit
 		}));
-		_express.use(bodyParser.urlencoded({
+		_express.use(express.urlencoded({
 			limit: Locals.config().maxUploadLimit,
 			parameterLimit: Locals.config().maxParameterLimit,
-			extended: false
+			extended: true
 		}));
+		// // Allow files to be uploaded and access through the formdata/multipart content type
+		_express.use(fileUpload());
+
 		// Added middleware to expose appconfig to all requests
 		_express.use((req, res, next)=> {
 			res.locals.app = _express.locals.app;
@@ -33,7 +36,7 @@ export default class Http {
 		})
 
 		// Disable the x-powered-by header in response
-		_express.disable('x-powered-by');
+		_express.disable('X-Powered-By');
 
 		// Enables the request flash message
 				/**

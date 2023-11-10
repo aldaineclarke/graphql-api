@@ -59,7 +59,7 @@ export default class Handler {
 				const innerMessage = err.inner && err.inner.message ? err.inner.message : undefined;
 				return JsonResponse.error(res, "Unauthorized access attempted", [innerMessage], HttpStatusCode.UNAUTHORIZED)
 			}
-
+			console.log(err.stack)
 			return JsonResponse.error(res, "An error occurred with the request", [err], HttpStatusCode.INTERNAL_SERVER_ERROR)
 		}
 

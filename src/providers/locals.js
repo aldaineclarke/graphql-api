@@ -42,6 +42,11 @@ export default class Locals {
 		const redisPrefix = process.env.REDIS_QUEUE_DB || 'q';
 		const redisDB = process.env.REDIS_QUEUE_PREFIX || 3;
 
+		const amzS3Region = process.env.AMZ_S3_REGION || ""
+		const amzS3Bucket = process.env.AMZ_S3_BUCKET || ""
+		const amzS3SecretKey = process.env.AMZ_S3_SECRET_KEY || ""
+		const amzS3AccessKey = process.env.AMZ_S3_ACCESS_KEY || ""
+
 		return {
 			appSecret,
 			apiPrefix,
@@ -63,7 +68,11 @@ export default class Locals {
 			redisPrefix,
 			url,
 			queueMonitor,
-			queueMonitorHttpPort
+			queueMonitorHttpPort,
+			amzS3AccessKey,
+			amzS3Bucket,
+			amzS3Region,
+			amzS3SecretKey
 		};
 	}
 

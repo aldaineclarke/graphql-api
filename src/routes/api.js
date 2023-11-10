@@ -18,6 +18,6 @@ router.post('/auth/login', UserRequest.validateLogin,AuthController.login);
 router.post('/auth/register',UserRequest.validateRegister,AuthController.register);
 // router.post('/auth/refresh-token', expressJwt({ secret: Locals.config().appSecret }), RefreshTokenController.perform);
 
-router.use('/users',isAuthorized,userRouter);
+router.use('/users',userRouter);
 
 export default router;

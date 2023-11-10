@@ -42,12 +42,11 @@ export default class AuthController {
 
 
             }catch(err){
-                log.error(err)
-                return JsonResponse.error(res, "Something happenned, try again", [err],HttpStatusCode.INTERNAL_SERVER_ERROR)
+               next(err)
             }
          
     }
-    static async register (req, res){
+    static async register (req, res, next){
 		const _email = req.body.email.toLowerCase();
 
 		const newUser = new User({
@@ -64,11 +63,8 @@ export default class AuthController {
             }
 
         }catch(err){
-            log.error(err);
-
-            return JsonResponse.error(res, "Something happenned, try again", [err],HttpStatusCode.INTERNAL_SERVER_ERROR)
-
-        }
+            next(err)
+         }
 			
     }
 }

@@ -86,7 +86,7 @@ export default class UserController{
         aggregatedUsers[0].users = this.parseUsers(aggregatedUsers[0].users)
         return JsonResponse.success(res, "Successfully retrieved users", {...aggregatedUsers[0]});
     }
-    static getUserById = async (req, res)=>{
+    static getUserById = async (req, res, next)=>{
         let id = req.params.id;
         try{
             let user = await User.findById(id).where({isDeleted:false});
@@ -95,12 +95,11 @@ export default class UserController{
             }
             return JsonResponse.success(res, "Successfully retrieved user", {user: user.parseUserData()})
         }catch(e){
-            log.error(e);
-            return JsonResponse.error(res, "Something went wrong", HttpStatusCode.INTERNAL_SERVER_ERROR);
+            next(e);
         }
         
     }
-    static updateUserData = async(req, res)=>{
+    static updateUserData = async(req, res, next)=>{
         let id = req.params.id;
         try{
             let user = await User.findById(id).where({isDeleted:false});
@@ -113,11 +112,10 @@ export default class UserController{
 
             return JsonResponse.success(res, "Successfully updated user", {user: updatedUser.parseUserData()})
         }catch(e){
-            log.error(e);
-            return JsonResponse.error(res, "Something went wrong", [e], HttpStatusCode.INTERNAL_SERVER_ERROR);
+            next(e);
         }
     }
-    static deleteUser = async (req, res)=>{
+    static deleteUser = async (req, res,next)=>{
         let id = req.params.id;
         try{
             let user = await User.findById(id).where({isDeleted:false});
@@ -127,17 +125,15 @@ export default class UserController{
             let updatedUser = await User.findByIdAndUpdate(id, {isDeleted: true});
             return JsonResponse.success(res, "Successfully deleted user");
         }catch(e){
-            log.error(e);
-            return JsonResponse.error(res, "Something went wrong", HttpStatusCode.INTERNAL_SERVER_ERROR);
-
+            next(e);
         }
 
     }
-    static updateUserPhoto = async(req, res)=>{
+    static updateUserPhoto = async(req, res, next)=>{
         let photo = req.files.profile_image;
         let userId = req.body.user_id;
         try{
-            let user = await User.findById(userId).where({isDeleted:false});
+            let user = await User.findById(userId).where({isDeleted:{$ne:true}});
             if(!user){
                 return JsonResponse.error(res, "No matching records found", ["Unable to update user profile image, user does not exist"],HttpStatusCode.NOT_FOUND)
             }
@@ -150,9 +146,7 @@ export default class UserController{
             return JsonResponse.success(res, "Successfully update profile");
 
         }catch(e){
-            log.error(e);
-            return JsonResponse.error(res, "Something went wrong", HttpStatusCode.INTERNAL_SERVER_ERROR);
-
+            next(e);
         }
     }
     static parseUsers = (userList = [])=>{

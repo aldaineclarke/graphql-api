@@ -60,8 +60,9 @@ export default class Handler {
 				return JsonResponse.error(res, "Unauthorized access attempted", [innerMessage], HttpStatusCode.UNAUTHORIZED)
 			}
 			console.log(err.stack)
-			return JsonResponse.error(res, "An error occurred with the request", [err], HttpStatusCode.INTERNAL_SERVER_ERROR)
+			return JsonResponse.error(res, "An error occurred with the request", [{error: err.name || undefined, message: err.message}], HttpStatusCode.INTERNAL_SERVER_ERROR)
 		}
+		log.error(err)
 
 		return res.render('pages/error', { error: err.stack, title: 'Under Maintenance' });
 	}

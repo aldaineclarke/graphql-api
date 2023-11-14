@@ -5,10 +5,11 @@
  */
 
 import jwt from 'jsonwebtoken';
-import log from '../../middlewares/log.js';
 import {User} from '../../schema/user.js';
 import JsonResponse from '../../helpers/JsonResponse.helper.js';
 import HttpStatusCode from '../../helpers/StatusCodes.helper.js';
+import { EncryptionService } from '../../helpers/Encryption.helper.js';
+import Mailer from '../../helpers/Mailer.helper.js';
 
 export default class AuthController {
 
@@ -66,6 +67,56 @@ export default class AuthController {
             next(err)
          }
 			
+    }
+
+    static async requestPasswordReset (req, res, next){
+        let email = req.body.email;
+        // this should be taken care of in in the express validator for user request.
+        if(!email){
+            return JsonResponse.error(res, "No email provided", ["No email provided to request password reset"])
+        }
+        let _email = email.toLowerCase();
+        try{
+            let user = await User.findOne({email:_email});
+            if(!user){
+                return JsonResponse.error(res, "No matching records found", ["Email does not match any accounts"])
+            }
+            // generate a token then send said token to the user via password reset template. 
+            let enc = EncryptionService.set({id: user.id, email:user.email});
+
+            // This will be the url that is sent in the email template to the user.
+            let url = 'http://localhost:4200/password-reset/'+enc;
+            
+            let compiledHtml =  Mailer.compileTemplate("emails/password-reset.ejs", {user:{name:user.first_name +" "+ user.last_name}, url:url})
+            Mailer.sendMail("aldaineclarke1@gmail.com", "Password Reset",null,compiledHtml)
+            return JsonResponse.success(res, "Successfully Requested Password Reset", {token: enc});
+
+
+        }catch(err){
+            next(err)
+        }
+    }
+
+    static async resetPassword(req, res, next){
+        let token = req.body.token; // token from the password reset request sent to the user.
+        let password = req.body.password;
+
+        // Decrypt token sent from the requestpasswordreset endpoint
+        let tokenObj = JSON.parse(JSON.parse(EncryptionService.get(token)));
+
+        try{
+            let user = await User.findById(tokenObj.id).where({isDeleted: {$ne : true}});
+            if(!user){
+                return JsonResponse.error(res, "No matching records found");
+            }
+            user.password = password;
+            await user.save()
+            return JsonResponse.success(res, "Password reset was successful");
+        }catch(err){
+            next(err)
+        }
+
+
     }
 }
 

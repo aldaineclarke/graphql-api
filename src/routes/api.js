@@ -16,8 +16,12 @@ import { userRouter } from './user.route.js';
 
 router.post('/auth/login', UserRequest.validateLogin,AuthController.login);
 router.post('/auth/register',UserRequest.validateRegister,AuthController.register);
+router.post('/requestpasswordreset',UserRequest.validatePasswordResetRequest, AuthController.requestPasswordReset);
+router.post('/resetpassword', UserRequest.validatePasswordReset,AuthController.resetPassword);
+
 // router.post('/auth/refresh-token', expressJwt({ secret: Locals.config().appSecret }), RefreshTokenController.perform);
 
 router.use('/users',userRouter);
+router.get('/test', (req, res)=> res.render('pages/test'))
 
 export default router;

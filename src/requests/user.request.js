@@ -34,6 +34,22 @@ export default class UserRequest{
         body('password', 'Password cannot be blank').notEmpty(),
         body('password', 'Password length must be atleast 8 characters').isLength({ min: 8 }),
     ];
+
+    static passwordResetRequestValidation = [
+        body('email', 'Email cannot be blank').notEmpty(),
+        body('email', 'Email is not valid').isEmail()
+    ]
+    static passwordResetValidation = [
+        body('token', 'No token provided please try again later').notEmpty(),
+        body('password', 'Password should not be blank').notEmpty(),
+        body('password', 'Password must be eight characters including one uppercase letter, one special character and alphanumeric characters').matches(/(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/),
+        body('confirmPassword', 'Confirmation Password cannot be blank').notEmpty(),
+        body('confirmPassword', 'Password & Confirmation password does not match').custom((value, {req})=>{
+            return value === req.body.password;
+        }),
+    ]
+
+
     static async _validateMiddleware(req, res, next, validationArr ){
         for (let validation of validationArr) {
           const result = await validation.run(req);
@@ -49,10 +65,16 @@ export default class UserRequest{
 
 
     static validateLogin = async(req, res, next) =>{
-        return this._validateMiddleware(req, res, next, this.loginValidation)
+        return await this._validateMiddleware(req, res, next, this.loginValidation)
     }
     static validateRegister = async(req, res, next)=>{
         return await this._validateMiddleware(req, res, next, this.createUserValidator)
+    }
+    static validatePasswordReset = async(req, res, next)=>{
+        return await this._validateMiddleware(req, res, next, this.passwordResetValidation)
+    }
+    static validatePasswordResetRequest = async(req, res, next)=>{
+        return await this._validateMiddleware(req, res, next, this.passwordResetRequestValidation)
     }
 
 

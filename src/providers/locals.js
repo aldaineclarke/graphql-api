@@ -47,6 +47,11 @@ export default class Locals {
 		const amzS3SecretKey = process.env.AMZ_S3_SECRET_KEY || ""
 		const amzS3AccessKey = process.env.AMZ_S3_ACCESS_KEY || ""
 
+		const mailHost = process.env.MAIL_HOST
+		const mailPort = process.env.MAIL_PORT 
+		const mailAuthPassword = process.env.MAIL_AUTH_PASSWORD
+		const mailAuthEmail = process.env.MAIL_AUTH_EMAIL
+
 		return {
 			appSecret,
 			apiPrefix,
@@ -72,7 +77,11 @@ export default class Locals {
 			amzS3AccessKey,
 			amzS3Bucket,
 			amzS3Region,
-			amzS3SecretKey
+			amzS3SecretKey,
+			mailAuthEmail,
+			mailAuthPassword,
+			mailHost,
+			mailPort
 		};
 	}
 

@@ -4,6 +4,7 @@ import HttpStatusCode from '../../helpers/StatusCodes.helper.js';
 import log from '../../middlewares/log.js';
 import { getKeyByValue } from '../../helpers/Utility.helper.js';
 import AWSStorage from "../../providers/storage.js";
+import mailer from '../../helpers/Mailer.helper.js';
 export default class UserController{
     
     
@@ -137,6 +138,7 @@ export default class UserController{
             if(!user){
                 return JsonResponse.error(res, "No matching records found", ["Unable to update user profile image, user does not exist"],HttpStatusCode.NOT_FOUND)
             }
+            await mailer.sendMail("aldaineclarke1@gmail.com", "This is a test", "The Body of the Message is here")
             // gets the previous image location on AWS to delete.
             // let prevImage = user.profile_image;
             // This line will assign location of file to the profile image of the user if it's success.

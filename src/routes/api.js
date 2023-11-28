@@ -18,7 +18,7 @@ router.post('/auth/login', UserRequest.validateLogin,AuthController.login);
 router.post('/auth/register',UserRequest.validateRegister,AuthController.register);
 router.post('/requestpasswordreset',UserRequest.validatePasswordResetRequest, AuthController.requestPasswordReset);
 router.post('/resetpassword', UserRequest.validatePasswordReset,AuthController.resetPassword);
-
+// router.post('/verifyotp', AuthController.verifyOtp)
 // router.post('/auth/refresh-token', expressJwt({ secret: Locals.config().appSecret }), RefreshTokenController.perform);
 
 router.use('/users',userRouter);

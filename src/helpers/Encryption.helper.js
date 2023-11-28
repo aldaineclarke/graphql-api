@@ -4,12 +4,14 @@ import Locals from '../providers/locals.js';
 
 export class EncryptionService {
   constructor() { }
-   ivStr = "YHeLeAzUTz2ypCfW" //this.randomString(16, environment.RANDOM)
+   ivStr = "YHeLeAzUTz2ypCfW" // 16 character string that should be randomized.
   //The set method is use for encrypt the value.
   static set(value) {
     let key = Locals.config().appSecret;
+    key = CryptoJS.enc.Utf8.parse(key);
+    let waKey = CryptoJS.lib.WordArray.create(key)
     let iv = CryptoJS.enc.Utf8.parse(this.ivStr);
-    let encrypted = CryptoJS.AES.encrypt(JSON.stringify(value), key,
+    let encrypted = CryptoJS.AES.encrypt(JSON.stringify(value), waKey,
       {
         keySize:  128 / 8,
         iv: iv,
@@ -22,11 +24,14 @@ export class EncryptionService {
   //The get method is use for decrypt the value.
   static get(value)  {
     let key = Locals.config().appSecret;
+    key = CryptoJS.enc.Utf8.parse(key);
+    let waKey = CryptoJS.lib.WordArray.create(key)
+
     let iv = CryptoJS.enc.Utf8.parse(this.ivStr);
 
       try {
 
-        const bytes = CryptoJS.AES.decrypt(value,key,
+        const bytes = CryptoJS.AES.decrypt(value,waKey,
             {
             keySize:  128 / 8,
             iv: iv,

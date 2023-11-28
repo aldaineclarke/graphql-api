@@ -5,7 +5,7 @@
  */
 
 import jwt from 'jsonwebtoken';
-import {User} from '../../schema/user.js';
+import { User } from '../../schema/user.js';
 import JsonResponse from '../../helpers/JsonResponse.helper.js';
 import HttpStatusCode from '../../helpers/StatusCodes.helper.js';
 import { EncryptionService } from '../../helpers/Encryption.helper.js';
@@ -17,7 +17,6 @@ export default class AuthController {
             try{
                 const _email = req.body.email.toLowerCase();
                 const _password = req.body.password;
-
                 let user = await User.findOne({email: _email});
                 if (!user) {
                     return JsonResponse.error(res, "No matching records found", ["User does not exist in database"], HttpStatusCode.NOT_FOUND)
@@ -83,7 +82,9 @@ export default class AuthController {
             }
             // generate a token then send said token to the user via password reset template. 
             let enc = EncryptionService.set({id: user.id, email:user.email});
-
+            user.passwordResetToken = enc;
+            // sets the token expires time to 24 hours away from right now.
+            user.passwordResetExpires = new Date(new Date().getTime() + (24 * 60 * 60 * 1000)); 
             // This will be the url that is sent in the email template to the user.
             let url = 'http://localhost:4200/password-reset/'+enc;
             
@@ -93,7 +94,7 @@ export default class AuthController {
 
 
         }catch(err){
-            next(err)
+            next(err);
         }
     }
 
@@ -106,15 +107,30 @@ export default class AuthController {
 
         try{
             let user = await User.findById(tokenObj.id).where({isDeleted: {$ne : true}});
-            if(!user){
+            if(!user ){
                 return JsonResponse.error(res, "No matching records found");
             }
+            if(!user.passwordResetExpires < new Date()){
+                return JsonResponse(res, "Password reset attempt failed", ["Reset request has expired. Try again later"])
+            }
+            if(!user.passwordResetToken){
+                return JsonResponse.error(res, "Password reset attempt failed", ["No request to reset password was made. Try again later"])
+            }
             user.password = password;
-            await user.save()
+            user.passwordResetToken = null,
+            user.passwordResetExpires = null,
+            await user.save();
             return JsonResponse.success(res, "Password reset was successful");
         }catch(err){
             next(err)
         }
+
+
+    }
+
+    static async verifyOtp(req, res, next){
+        let otp = req.body.otp;
+
 
 
     }

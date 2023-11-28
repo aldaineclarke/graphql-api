@@ -13,7 +13,6 @@ export default class Database {
 		}).catch((error) => {
 				console.log('Failed to connect to the Mongo server!!');
 				Log.info('Failed to connect to the Mongo server!!');
-				console.log(error);
 				throw error;
 		});
 	}

@@ -26,7 +26,7 @@ export default new class Emailer {
 	 * @param {string} sub - The subject of the email
 	 * @param {string} body - The body of the email
 	 */
-	sendMail(to, sub, body_text = null,body_html, attachment) {
+	sendMail(to, sub, body_text = null,body_html=null, attachment) {
         console.log(Locals.config().mailHost)
 		let selectedAttachment = [];
 		// check if attachment is an array;
@@ -61,7 +61,6 @@ export default new class Emailer {
 		let templatePath = path.join(__dirname, "../templates", templateName);
 		let fileExists = fs.existsSync(templatePath);
 		if(!fileExists){
-			console.log(templatePath)
 			throw new Error("File does not exist")
 		}
 		let html = ejs.compile(fs.readFileSync(templatePath,'utf8'));

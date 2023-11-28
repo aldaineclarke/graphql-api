@@ -1,5 +1,3 @@
-
-
 import bcrypt from 'bcrypt';
 import mongoose from 'mongoose';
 import log from '../middlewares/log.js';
@@ -45,8 +43,40 @@ let userSchemaMethods = {
 		}catch(error){
 			log(error);
 		}
+	},
+
+	/**
+	 * Compares the string passed in to the decrypted password of the user document.
+	 * @param {string} _requestPassword 
+	 * @returns 
+	 */
+	async comparePassword(_requestPassword){
+	try{
+		return await bcrypt.compare(_requestPassword, this.password);
+	}catch(error){
+		throw new Error('Unable to compare passwords');
 	}
+	},
+
+	/**
+	 * Checks user for duplicates using the email property of the user document.
+	 * @param {mongoose.Model} _user 
+	 * @returns 
+	 */
+	async checkDuplicates(_user){
+	try{
+		let existingUser = await User.findOne({email: _user.email.toLowerCase()})
+		if(existingUser){
+			return true;
+		}
+		return false;
+	}catch(e){
+		throw new Error('Unable to query User Table to check duplicates');
+	}
+
+},
 } 
+
 
 // Define the User Schema
 const UserSchema = new mongoose.Schema({
@@ -64,12 +94,22 @@ const UserSchema = new mongoose.Schema({
 	role_id: {type: Number, enum: Array.from(userRoleMap.keys()), default: 0},
 	passwordResetToken: { type: String },
 	passwordResetExpires: {type:Date},	
+	provider: {type: String, enum: {values:["google", "facebook", "twitter", "apple"], message: '{VALUE} is not a valid provider name'}},
+	access_token: {
+		type: String, 
+		required:function(){
+			return !!this.provider // this will check if provider is present. if it is then an access_token is needed
+		}
+	},
 	status: { type: Number, enum: Array.from(userStatusMap.keys()), default: 0 },
 	isDeleted: {type:Boolean, default:false}
 
 }, {
 	timestamps: true,
-	methods:userSchemaMethods // custom methods for the user instance document.
+	methods:userSchemaMethods, // custom methods for the user instance document.
+	statics: userSchemaStaticMethods,
+	
+	
 });
 
 // Password hash middleware
@@ -91,33 +131,11 @@ UserSchema.pre('save', async function(_next){
 });
 
 // Custom Methods
-// Compares the user's password with the request password
-UserSchema.methods.comparePassword = async function(_requestPassword){
-	try{
-		return await bcrypt.compare(_requestPassword, this.password);
-	}catch(error){
-		console.log(error)
-		log.error('Unable to compare passwords');
-		throw new Error('Unable to compare passwords');
-
-	}
-};
 
 
 
-//Checks user for duplicates
-UserSchema.methods.checkDuplicates = async(_user)=>{
-	try{
-		let existingUser = await User.findOne({email: _user.email})
-		if(existingUser){
-			return true;
-		}
-		return false;
-	}catch(e){
-		log.error('Unable to query User Table to check duplicates');
-		throw new Error('Unable to query User Table to check duplicates');
-	}
-}
+
+
 
 
 export const User = mongoose.model('User', UserSchema);

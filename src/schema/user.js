@@ -107,7 +107,7 @@ const UserSchema = new mongoose.Schema({
 }, {
 	timestamps: true,
 	methods:userSchemaMethods, // custom methods for the user instance document.
-	statics: userSchemaStaticMethods,
+
 	
 	
 });

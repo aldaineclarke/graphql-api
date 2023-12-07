@@ -22,11 +22,11 @@ export default class Handler {
 			if (req.xhr || req.originalUrl.includes(`/${apiPrefix}/`)) {
 				return JsonResponse.error(res, "Page Not Found",[], HttpStatusCode.NOT_FOUND)
 			} else {
-				res.status(404);
-				return res.render('pages/error', {
-					title: 'Page Not Found',
-					error: []
-				});
+				return res.status(404);
+				// return res.render('pages/error', {
+				// 	title: 'Page Not Found',
+				// 	error: []
+				// });
 			}
 		});
 
